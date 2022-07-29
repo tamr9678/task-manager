@@ -8,6 +8,51 @@ interface Validatable {
   max?: number;
 }
 
+class Task {
+  constructor(
+    public title: string,
+    public description: string,
+    public duration: number,
+    public status: 'active' | 'finished',
+  ) {}
+}
+
+// タスクの状態管理
+class TasksState {
+  private listeners: any[] = [];
+  private tasks: Task[] = [];
+  private static instance: TasksState;
+
+  private constructor() {};
+
+  // singleton
+  static getInstance() {
+    if(this.instance) return this.instance;
+    this.instance = new TasksState();
+    return this.instance;
+  }
+
+  addListener(ListenerFunction: any) {
+    this.listeners.push(ListenerFunction);
+  }
+
+  addTasks(title: string, desc: string, duration: number) {
+    const newTask = new Task(
+      title,
+      desc,
+      duration,
+      'active'
+    );
+
+    this.tasks.push(newTask)
+    for (const ListenerFunction of this.listeners) {
+      ListenerFunction(this.tasks);
+    }
+  }
+}
+
+const tasksState = TasksState.getInstance();
+
 function validate(validatableInput: Validatable) {
   let isValid = true;
   if (validatableInput.required) {
@@ -50,6 +95,7 @@ class TasksList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
+  displayTasks: Task[];
 
   constructor(private status: 'finished' | 'active') {
     
@@ -64,8 +110,32 @@ class TasksList {
     );
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.status}-tasks`;
+    this.displayTasks = [];
+
+    tasksState.addListener((tasks: Task[]) => {
+      const targetTasks = tasks.filter(task => {
+        //this.status === task.status  動かない
+        if (this.status === 'finished'){
+          return task.status === 'finished'
+        } else {
+          return task.status === 'active'
+        }
+      });
+      this.displayTasks = targetTasks;
+      this.renderTasks();
+    });
+
     this.attach();
     this.renderContent();
+  }
+
+  private renderTasks() {
+    const listElement = document.getElementById(`${this.status}-list`)! as HTMLDataListElement;
+    for(const taskItem of this.displayTasks) {
+      const listItem = document.createElement('li');
+      listItem.textContent = taskItem.title;
+      listElement.appendChild(listItem);
+    }
   }
 
   private attach() {
@@ -160,6 +230,7 @@ class taskInput {
     if (Array.isArray(userInput)) {
       const [title, desc, duration] = userInput;
       console.log(title, desc, duration);
+      tasksState.addTasks(title, desc, duration);
       this.clearInputs();
     }
   }
