@@ -44,41 +44,6 @@ function validate(validatableInput: Validatable) {
   return isValid;
 }
 
-// tasksList
-class TasksList {
-
-  templateElement: HTMLTemplateElement;
-  hostElement: HTMLDivElement;
-  element: HTMLElement;
-
-  constructor(private status: 'finished' | 'active') {
-    
-    this.templateElement = document.getElementById(
-      "task-list"
-    )! as HTMLTemplateElement;
-    this.hostElement = document.getElementById("app")! as HTMLDivElement;
-
-    const importedNode = document.importNode(
-      this.templateElement.content,
-      true
-    );
-    this.element = importedNode.firstElementChild as HTMLElement;
-    this.element.id = `${this.status}-tasks`;
-    this.attach();
-    this.renderContent();
-  }
-
-  private attach() {
-    this.hostElement.insertAdjacentElement("beforeend", this.element);
-  }
-
-  private renderContent() {
-    this.element.querySelector("ul")!.id = `${this.status}-list`;
-    this.element.querySelector("h2")!.textContent = (this.status) === 'active' ? '進行中' : '完了済み' ;
-  }
-
-}
-
 // taskInput Class
 class taskInput {
   templateElement: HTMLTemplateElement;
@@ -174,5 +139,3 @@ class taskInput {
 }
 
 const tskInput = new taskInput();
-const finishedTskList = new TasksList('finished');
-const activeTskList = new TasksList('active');
