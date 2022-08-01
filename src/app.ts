@@ -14,7 +14,7 @@ class Task {
     public title: string,
     public description: string,
     public duration: number,
-    public status: 'active' | 'finished',
+    public status: "active" | "finished"
   ) {}
 }
 
@@ -24,11 +24,11 @@ class TasksState {
   private tasks: Task[] = [];
   private static instance: TasksState;
 
-  private constructor() {};
+  private constructor() {}
 
   // singleton
   static getInstance() {
-    if(this.instance) return this.instance;
+    if (this.instance) return this.instance;
     this.instance = new TasksState();
     return this.instance;
   }
@@ -38,15 +38,9 @@ class TasksState {
   }
 
   addTasks(id: string, title: string, desc: string, duration: number) {
-    const newTask = new Task(
-      id,
-      title,
-      desc,
-      duration,
-      'active'
-    );
+    const newTask = new Task(id, title, desc, duration, "active");
 
-    this.tasks.push(newTask)
+    this.tasks.push(newTask);
     for (const ListenerFunction of this.listeners) {
       ListenerFunction(this.tasks);
     }
@@ -78,21 +72,18 @@ function validate(validatableInput: Validatable) {
     validatableInput.min != null &&
     typeof validatableInput.value === "number"
   ) {
-    isValid =
-      isValid && validatableInput.value >= validatableInput.min;
+    isValid = isValid && validatableInput.value >= validatableInput.min;
   }
   if (
     validatableInput.max != null &&
     typeof validatableInput.value === "number"
   ) {
-    isValid =
-      isValid && validatableInput.value <= validatableInput.max;
+    isValid = isValid && validatableInput.value <= validatableInput.max;
   }
   return isValid;
 }
 
 class TaskItem {
-
   templateElement: HTMLTemplateElement;
   hostElement: HTMLUListElement;
   element: HTMLLIElement;
@@ -100,7 +91,6 @@ class TaskItem {
   private task: Task;
 
   constructor(hostId: string, elementId: string, task: Task) {
-    
     this.templateElement = document.getElementById(
       "single-task"
     )! as HTMLTemplateElement;
@@ -119,29 +109,26 @@ class TaskItem {
     this.renderContent();
   }
 
-
   private renderContent() {
-    this.element.querySelector('h2')!.textContent = this.task.title;
-    this.element.querySelector('h3')!.textContent = this.task.duration.toString();
-    this.element.querySelector('p')!.textContent = this.task.description;
+    this.element.querySelector("h2")!.textContent = this.task.title;
+    this.element.querySelector("h3")!.textContent =
+      this.task.duration.toString();
+    this.element.querySelector("p")!.textContent = this.task.description;
   }
 
   private attach() {
     this.hostElement.insertAdjacentElement("beforeend", this.element);
   }
-
 }
 
 // tasksList
 class TasksList {
-
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
   displayTasks: Task[];
 
-  constructor(private status: 'finished' | 'active') {
-    
+  constructor(private status: "finished" | "active") {
     this.templateElement = document.getElementById(
       "task-list"
     )! as HTMLTemplateElement;
@@ -156,12 +143,12 @@ class TasksList {
     this.displayTasks = [];
 
     tasksState.addListener((tasks: Task[]) => {
-      const targetTasks = tasks.filter(task => {
+      const targetTasks = tasks.filter((task) => {
         //this.status === task.status  動かない
-        if (this.status === 'finished'){
-          return task.status === 'finished'
+        if (this.status === "finished") {
+          return task.status === "finished";
         } else {
-          return task.status === 'active'
+          return task.status === "active";
         }
       });
       this.displayTasks = targetTasks;
@@ -173,10 +160,12 @@ class TasksList {
   }
 
   private renderTasks() {
-    const listElement = document.getElementById(`${this.status}-list`)! as HTMLUListElement;
-    listElement.innerHTML = '';
-    for(const taskItem of this.displayTasks) {
-      new TaskItem(listElement.id, taskItem.id ,taskItem);
+    const listElement = document.getElementById(
+      `${this.status}-list`
+    )! as HTMLUListElement;
+    listElement.innerHTML = "";
+    for (const taskItem of this.displayTasks) {
+      new TaskItem(listElement.id, taskItem.id, taskItem);
     }
   }
 
@@ -186,9 +175,9 @@ class TasksList {
 
   private renderContent() {
     this.element.querySelector("ul")!.id = `${this.status}-list`;
-    this.element.querySelector("h2")!.textContent = (this.status) === 'active' ? '進行中' : '完了済み' ;
+    this.element.querySelector("h2")!.textContent =
+      this.status === "active" ? "進行中" : "完了済み";
   }
-
 }
 
 // taskInput Class
@@ -246,7 +235,6 @@ class taskInput {
       required: true,
       min: 1,
       max: 1000,
-
     };
     if (
       !validate(titleValidatable) ||
@@ -272,7 +260,12 @@ class taskInput {
     if (Array.isArray(userInput)) {
       const [title, desc, duration] = userInput;
       console.log(title, desc, duration);
-      tasksState.addTasks(Math.random().toString(32).substring(2), title, desc, duration);
+      tasksState.addTasks(
+        Math.random().toString(32).substring(2),
+        title,
+        desc,
+        duration
+      );
       this.clearInputs();
     }
   }
@@ -287,5 +280,5 @@ class taskInput {
 }
 
 const tskInput = new taskInput();
-const finishedTskList = new TasksList('finished');
-const activeTskList = new TasksList('active');
+const finishedTskList = new TasksList("finished");
+const activeTskList = new TasksList("active");
