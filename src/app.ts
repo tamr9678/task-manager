@@ -10,6 +10,7 @@ interface Validatable {
 
 class Task {
   constructor(
+    public id: string,
     public title: string,
     public description: string,
     public duration: number,
@@ -36,8 +37,9 @@ class TasksState {
     this.listeners.push(ListenerFunction);
   }
 
-  addTasks(title: string, desc: string, duration: number) {
+  addTasks(id: string, title: string, desc: string, duration: number) {
     const newTask = new Task(
+      id,
       title,
       desc,
       duration,
@@ -89,6 +91,47 @@ function validate(validatableInput: Validatable) {
   return isValid;
 }
 
+class TaskItem {
+
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLUListElement;
+  element: HTMLLIElement;
+
+  private task: Task;
+
+  constructor(hostId: string, elementId: string, task: Task) {
+    
+    this.templateElement = document.getElementById(
+      "single-task"
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById(hostId)! as HTMLUListElement;
+
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.element = importedNode.firstElementChild as HTMLLIElement;
+    this.element.id = elementId;
+
+    this.task = task;
+
+    this.attach();
+    this.renderContent();
+  }
+
+
+  private renderContent() {
+    this.element.querySelector('h2')!.textContent = this.task.title;
+    this.element.querySelector('h3')!.textContent = this.task.duration.toString();
+    this.element.querySelector('p')!.textContent = this.task.description;
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement("beforeend", this.element);
+  }
+
+}
+
 // tasksList
 class TasksList {
 
@@ -130,11 +173,10 @@ class TasksList {
   }
 
   private renderTasks() {
-    const listElement = document.getElementById(`${this.status}-list`)! as HTMLDataListElement;
+    const listElement = document.getElementById(`${this.status}-list`)! as HTMLUListElement;
+    listElement.innerHTML = '';
     for(const taskItem of this.displayTasks) {
-      const listItem = document.createElement('li');
-      listItem.textContent = taskItem.title;
-      listElement.appendChild(listItem);
+      new TaskItem(listElement.id, taskItem.id ,taskItem);
     }
   }
 
@@ -230,7 +272,7 @@ class taskInput {
     if (Array.isArray(userInput)) {
       const [title, desc, duration] = userInput;
       console.log(title, desc, duration);
-      tasksState.addTasks(title, desc, duration);
+      tasksState.addTasks(Math.random().toString(32).substring(2), title, desc, duration);
       this.clearInputs();
     }
   }
