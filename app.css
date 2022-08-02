@@ -1,7 +1,123 @@
-/* TODO: 書く */
+* {
+  box-sizing: border-box;
+}
 
-/* paddingがないとドロップするスペースがないので仮置き */
+body {
+  font: inherit;
+}
+
+header h1 {
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 0;
+  font-size: 3rem;
+}
+
+form {
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid #9c9c9c;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.form-control {
+  padding: 10px;
+  width: 65%;
+}
+
+.form-control label {
+  font: inherit;
+  display: block;
+  border-left: solid 5px #5250e0;
+  padding-left: 0.2rem;
+  margin-bottom: 0.3rem;
+}
+
+input,
+textarea {
+  font: inherit;
+  padding: 0.2rem 0.4rem;
+  width: 100%;
+  max-width: 30rem;
+  border: 1px solid #ccc;
+  background: #d7eeff;
+}
+
+button {
+  margin: 10px;
+  font: inherit;
+  background: #5250e0;
+  border: 1px solid #5250e0;
+  cursor: pointer;
+  color: white;
+  padding: 0.75rem 1rem;
+}
+
+button:hover {
+  background: #2626d3;
+  border: 1px solid #2626d3;
+}
+
+.tasks {
+  margin: 1rem auto;
+}
+
+#active-tasks {
+  border: 1px solid #33ccff;
+}
+
+#active-tasks h2 {
+  background-color: #33ccff;
+  color: white;
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
+#finished-tasks {
+  border: 1px solid #ff6666;
+}
+
+#finished-tasks h2 {
+  background-color: #ff6666;
+  color: white;
+  padding: 0.75rem 1rem;
+  margin: 0;
+}
+
 .tasks ul {
+  list-style: none;
   margin: 0;
   padding: 1rem;
+}
+
+.droppable {
+  background-color: #dddddd;
+}
+
+.tasks li {
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.26);
+  padding: 1rem;
+  margin: 1rem;
+  background-color: white;
+}
+
+.tasks li h2 {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.tasks li h2 {
+  margin: 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+.tasks li h3 {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.tasks li p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
 }
