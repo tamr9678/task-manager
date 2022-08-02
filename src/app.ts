@@ -196,17 +196,27 @@ class TasksList implements DragTarget {
   dragOverHandler(event: DragEvent) {
     if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
       event.preventDefault();
+      const listElement = this.element.querySelector('ul');
+      listElement?.classList.add('droppable');
     }
   }
 
   dropHandler(event: DragEvent) {
     const taskId = event.dataTransfer!.getData("text/plain");
     tasksState.changeTaskStatus(taskId, this.status);
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.remove('droppable');
+  }
+
+  dragLeaveHandler(_: DragEvent) {
+    const listElement = this.element.querySelector('ul');
+    listElement?.classList.remove('droppable');
   }
 
   private configure() {
     this.element.addEventListener("dragover", this.dragOverHandler.bind(this));
     this.element.addEventListener("drop", this.dropHandler.bind(this));
+    this.element.addEventListener("dragleave", this.dragLeaveHandler.bind(this));
   }
 
   private renderTasks() {
