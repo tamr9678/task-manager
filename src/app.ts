@@ -14,8 +14,7 @@ interface Validatable {
   required?: boolean;
   minLength?: number;
   maxLength?: number;
-  min?: number;
-  max?: number;
+  startDate?: boolean;
 }
 
 class Task {
@@ -89,16 +88,10 @@ function validate(validatableInput: Validatable) {
       isValid && validatableInput.value.length <= validatableInput.maxLength;
   }
   if (
-    validatableInput.min != null &&
-    typeof validatableInput.value === "number"
+    validatableInput.startDate != null &&
+    typeof validatableInput.value === "string"
   ) {
-    isValid = isValid && validatableInput.value >= validatableInput.min;
-  }
-  if (
-    validatableInput.max != null &&
-    typeof validatableInput.value === "number"
-  ) {
-    isValid = isValid && validatableInput.value <= validatableInput.max;
+    isValid = isValid && new Date(validatableInput.value) >= new Date()
   }
   return isValid;
 }
@@ -293,6 +286,7 @@ class taskInput {
     const deadlineValidatable: Validatable = {
       value: enteredDeadline,
       required: true,
+      startDate: true,
     };
     if (
       !validate(titleValidatable) ||
