@@ -23,7 +23,7 @@ class Task {
     public id: string,
     public title: string,
     public description: string,
-    public duration: number,
+    public deadline: string,
     public status: "active" | "finished"
   ) {}
 }
@@ -47,8 +47,8 @@ class TasksState {
     this.listeners.push(ListenerFunction);
   }
 
-  addTasks(id: string, title: string, desc: string, duration: number) {
-    const newTask = new Task(id, title, desc, duration, "active");
+  addTasks(id: string, title: string, desc: string, deadline: string) {
+    const newTask = new Task(id, title, desc, deadline, "active");
 
     this.tasks.push(newTask);
     for (const ListenerFunction of this.listeners) {
@@ -145,7 +145,7 @@ class TaskItem implements Draggable {
   private renderContent() {
     this.element.querySelector("h2")!.textContent = this.task.title;
     this.element.querySelector("h3")!.textContent =
-      this.task.duration.toString();
+      this.task.deadline.toString();
     this.element.querySelector("p")!.textContent = this.task.description;
   }
 
@@ -247,7 +247,7 @@ class taskInput {
   element: HTMLFormElement;
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
-  durationInputElement: HTMLInputElement;
+  deadlineInputElement: HTMLInputElement;
 
   constructor() {
     this.templateElement = document.getElementById(
@@ -268,18 +268,18 @@ class taskInput {
     this.descriptionInputElement = this.element.querySelector(
       "#description"
     ) as HTMLInputElement;
-    this.durationInputElement = this.element.querySelector(
-      "#duration"
+    this.deadlineInputElement = this.element.querySelector(
+      "#deadline"
     ) as HTMLInputElement;
 
     this.configure();
     this.attach();
   }
 
-  private gatherUserInput(): [string, string, number] | void {
+  private gatherUserInput(): [string, string, string] | void {
     const enteredTitle = this.titleInputElement.value;
     const enteredDescription = this.descriptionInputElement.value;
-    const enteredduration = this.durationInputElement.value;
+    const enteredDeadline = this.deadlineInputElement.value;
 
     const titleValidatable: Validatable = {
       value: enteredTitle,
@@ -290,41 +290,39 @@ class taskInput {
       required: true,
       minLength: 5,
     };
-    const durationValidatable: Validatable = {
-      value: +enteredduration,
+    const deadlineValidatable: Validatable = {
+      value: enteredDeadline,
       required: true,
-      min: 1,
-      max: 1000,
     };
     if (
       !validate(titleValidatable) ||
       !validate(descriptionValidatable) ||
-      !validate(durationValidatable)
+      !validate(deadlineValidatable)
     ) {
       alert("入力値が不正です");
       return;
     } else {
-      return [enteredTitle, enteredDescription, +enteredduration];
+      return [enteredTitle, enteredDescription, enteredDeadline];
     }
   }
 
   private clearInputs() {
     this.titleInputElement.value = "";
     this.descriptionInputElement.value = "";
-    this.durationInputElement.value = "";
+    this.deadlineInputElement.value = "";
   }
 
   private submitHandler(event: Event) {
     event.preventDefault();
     const userInput = this.gatherUserInput();
     if (Array.isArray(userInput)) {
-      const [title, desc, duration] = userInput;
-      console.log(title, desc, duration);
+      const [title, desc, deadline] = userInput;
+      console.log(title, desc, deadline);
       tasksState.addTasks(
         Math.random().toString(32).substring(2),
         title,
         desc,
-        duration
+        deadline
       );
       this.clearInputs();
     }
