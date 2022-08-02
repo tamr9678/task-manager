@@ -1,1 +1,7 @@
 /* TODO: 書く */
+
+/* paddingがないとドロップするスペースがないので仮置き */
+.tasks ul {
+  margin: 0;
+  padding: 1rem;
+}
