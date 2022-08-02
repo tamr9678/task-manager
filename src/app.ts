@@ -1,3 +1,13 @@
+// Drag and Drop
+interface Draggable {
+  dragStartHandler(event: DragEvent): void;
+}
+
+interface DragTarget {
+  dragOverHandler(event: DragEvent): void;
+  dropHandler(event: DragEvent): void;
+}
+
 // validation
 interface Validatable {
   value: string | number;
@@ -45,6 +55,16 @@ class TasksState {
       ListenerFunction(this.tasks);
     }
   }
+
+  changeTaskStatus(taskID: string, newStatus: "active" | "finished") {
+    const task = this.tasks.find((tsk) => tsk.id === taskID);
+    if (task && task.status !== newStatus) {
+      task.status = newStatus;
+      for (const ListenerFunction of this.listeners) {
+        ListenerFunction(this.tasks);
+      }
+    }
+  }
 }
 
 const tasksState = TasksState.getInstance();
@@ -83,7 +103,7 @@ function validate(validatableInput: Validatable) {
   return isValid;
 }
 
-class TaskItem {
+class TaskItem implements Draggable {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLUListElement;
   element: HTMLLIElement;
@@ -106,7 +126,20 @@ class TaskItem {
     this.task = task;
 
     this.attach();
+    this.configure();
     this.renderContent();
+  }
+
+  dragStartHandler(event: DragEvent) {
+    event.dataTransfer!.setData("text/plain", this.task.id);
+    event.dataTransfer!.effectAllowed = "move";
+  }
+
+  private configure() {
+    this.element.addEventListener(
+      "dragstart",
+      this.dragStartHandler.bind(this)
+    );
   }
 
   private renderContent() {
@@ -122,7 +155,7 @@ class TaskItem {
 }
 
 // tasksList
-class TasksList {
+class TasksList implements DragTarget {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
@@ -156,7 +189,24 @@ class TasksList {
     });
 
     this.attach();
+    this.configure();
     this.renderContent();
+  }
+
+  dragOverHandler(event: DragEvent) {
+    if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+      event.preventDefault();
+    }
+  }
+
+  dropHandler(event: DragEvent) {
+    const taskId = event.dataTransfer!.getData("text/plain");
+    tasksState.changeTaskStatus(taskId, this.status);
+  }
+
+  private configure() {
+    this.element.addEventListener("dragover", this.dragOverHandler.bind(this));
+    this.element.addEventListener("drop", this.dropHandler.bind(this));
   }
 
   private renderTasks() {
